@@ -31,10 +31,10 @@ class stumpClassify:
             rangeMax = self.X[:, i].max()
             stepSize = (rangeMax - rangeMin) / numSteps
             for j in range(-1, int(numSteps) + 1):
-                for inequal in ['lt','gt']:
+                for inequal in ['lt', 'gt']:
                     threshVal = (rangeMin + float(j) * stepSize)
                     predictVal = self.predict(i, threshVal, inequal)
-                    errArr = np.ones((m, 1))
+                    errArr = np.mat(np.ones((m, 1)))
                     errArr[predictVal == self.y] = 0
                     weightError = np.dot(weights.T, errArr)
                     # print "split: din %d, thresh %.2f, thresh ineqal:\
@@ -47,19 +47,13 @@ class stumpClassify:
                         self.bestStump['ineq'] = inequal
         return self.bestStump, minError, bestClasEst
 
-
-
-
 if __name__ == "__main__":
     data = [[1., 2.1], [2., 1.1], [1.3, 1.], [1., 1.], [2., 1.]]
     labels = [[1.0], [1.0], [-1.0], [-1.0], [1.0]]
     weights = np.mat([[0.2],[0.2],[0.2],[0.2],[0.2]])
     nn = stumpClassify(data, labels)
     bestStump, minError, bestClasEst = nn.train(weights)
-    # print bestStump
-    # print minError
-    # print bestClasEst
-    # print type(bestClasEst)
+
 
 
 

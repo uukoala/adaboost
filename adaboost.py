@@ -17,8 +17,6 @@ class adaboost:
         self.G = {}
         weights = np.mat(np.ones((m, 1))) / m
         aggClassEst = np.mat(np.zeros((m, 1)))
-        # for i in range(numIt):
-        #     self.G.setdefault(i)
         for i in range(numIt):
             self.G[i], error, classEst = self.weakc(X, y).train(weights)
             # print "weight_sample:", weights.T
@@ -43,30 +41,41 @@ class adaboost:
         m = X.shape[0]
         predictClass = np.zeros((m, 1))
         for i in range(len(self.G)):
-            # print self.G[i]['alpha']
-            # print self.G[i]['dim']
-            # print self.G[i]['thresh']
-            # print self.G[i]['ineq']
-            a = self.weakc(X).predict(self.G[i]['dim'],\
-                                                  self.G[i]['thresh'],\
-                                                  self.G[i]['ineq'])
-            print a
+
             predictClass += self.G[i]['alpha'] * \
                             self.weakc(X).predict(self.G[i]['dim'],\
                                                   self.G[i]['thresh'],\
                                                   self.G[i]['ineq'])
-            print predictClass
+            # print predictClass
         return np.sign(predictClass)
 
+def loadData(fileName):
+    numFeat = len(open(fileName).readline().split('\t'))
+    dataMat = []
+    labelMat = []
+    fr = open(fileName)
+    for line in fr.readlines():
+        lineArr = []
+        curLine = line.strip().split('\t')
+        for i in range(numFeat -1):
+            lineArr.append(float(curLine[i]))
+        dataMat.append(lineArr)
+        labelMat.append([float(curLine[-1])])
+    return dataMat,labelMat
 
 
 if __name__ == "__main__":
-    data = [[1., 2.1], [2., 1.1], [1.3, 1.], [1., 1.], [2., 1.]]
-    labels = [[1.0], [1.0], [-1.0], [-1.0], [1.0]]
+    data, labels = loadData("horseColicTraining2.txt")
     nn = adaboost(stumpClassify)
     nn.train(data, labels)
-    result = nn.predict([0,0])
-    print result
+    testdata, testlabel = loadData("horseColicTest2.txt")
+    result = nn.predict(testdata)
+    testlabel = np.mat(testlabel)
+    m = testlabel.shape[0]
+    error = np.mat(np.ones((m, 1)))
+    error[result == testlabel] = 0
+    errorrate = float(error.sum())/m
+    print errorrate
 
 
 
